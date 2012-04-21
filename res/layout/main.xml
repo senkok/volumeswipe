@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/main" android:orientation="horizontal"
+	android:gravity="fill_horizontal" android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+
+	<LinearLayout android:layout_height="fill_parent"
+		android:layout_width="0sp" android:layout_weight="0.15" />
+
+	<LinearLayout android:layout_height="fill_parent"
+		android:orientation="vertical" android:gravity="left|fill_vertical"
+		android:layout_width="0sp" android:layout_weight="0.8">
+
+	    <RelativeLayout android:layout_height="wrap_content"
+	        android:layout_width="fill_parent">
+		<CheckBox android:layout_height="wrap_content"
+			android:layout_width="wrap_content" 
+			android:layout_alignParentLeft="true"
+			android:id="@+id/active"
+			android:text="Active" android:textSize="24sp" />
+		<Button android:id="@+id/help" android:layout_height="wrap_content"
+			android:layout_alignParentRight="true"
+			android:layout_width="wrap_content" android:text="Help"
+			android:textSize="20sp" android:onClick="helpButton" />
+		</RelativeLayout>
+		
+		<RadioGroup android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:orientation="horizontal">
+			<RadioButton android:id="@+id/left" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:onClick="onLeft"
+				android:textSize="20sp" android:text="left side" />
+			<RadioButton android:id="@+id/right"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:onClick="onRight" android:textSize="20sp" android:text="right side" />
+		</RadioGroup>
+		<RadioGroup android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:orientation="horizontal">
+			<RadioButton android:id="@+id/vnarrow"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:onClick="onVNarrow" android:textSize="20sp" android:text="v. narrow" />
+		    		<RadioButton android:id="@+id/narrow"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:onClick="onNarrow" android:textSize="20sp" android:text="narrow" />
+			<RadioButton android:id="@+id/medium"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:onClick="onMedium" android:textSize="20sp" android:text="medium" />
+			<RadioButton android:id="@+id/wide" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:onClick="onWide"
+				android:textSize="20sp" android:text="wide" />
+		</RadioGroup>
+		<CheckBox android:layout_height="wrap_content"
+			android:layout_width="wrap_content" android:id="@+id/boost"
+			android:text="Boost volume (at your own risk)" android:textSize="24sp" />
+		<LinearLayout android:layout_width="fill_parent"
+			android:layout_height="0sp" android:layout_weight="1" />
+		
+		<TextView 
+		    android:id="@+id/info"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:textSize="18sp"
+		    android:text="@string/info"/>
+		
+		<LinearLayout android:layout_width="fill_parent"
+			android:layout_height="0sp" android:layout_weight="1" />
+				<ImageView android:id="@+id/ad" android:layout_width="wrap_content"		    
+			android:layout_height="wrap_content" android:src="@drawable/screendimad"
+			android:onClick="adOnClick"
+			/>
+
+
+		<LinearLayout android:layout_width="fill_parent"
+			android:layout_height="0sp" android:layout_weight="1" />
+	</LinearLayout>
+	<LinearLayout android:layout_height="fill_parent"
+		android:layout_width="0sp" android:layout_weight="0.15" />
+</LinearLayout>
