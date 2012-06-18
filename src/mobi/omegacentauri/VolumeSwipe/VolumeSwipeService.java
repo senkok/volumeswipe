@@ -58,6 +58,7 @@ public class VolumeSwipeService extends Service implements OnTouchListener {
 	private int height;
 	private VolumeController vc;
 	private float scale;
+	private Thread logThread = null;
 	private static final int windowType = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT; // PHONE, ALERT, DIALOG, OVERLAY, ERROR
 	
 	private static final String[] intercept = {
@@ -215,7 +216,7 @@ public class VolumeSwipeService extends Service implements OnTouchListener {
 		
         wm = (WindowManager)getSystemService(WINDOW_SERVICE);        
         am = (AudioManager)getSystemService(AUDIO_SERVICE);
-
+        
 		setBoost();
 	
 		ll = new LinearLayout(this);
@@ -257,13 +258,15 @@ public class VolumeSwipeService extends Service implements OnTouchListener {
 
 		startForeground(VolumeSwipe.NOTIFICATION_ID, n);
 		
-		new Thread(new Runnable(){
-
+		Runnable logRunnable = new Runnable(){
 			@Override
 			public void run() {
 				monitorLog();
-			}}).start();
+			}};  
+		logThread = new Thread(logRunnable);
 		
+		logThread.start();
+
 		VolumeSwipe.log("Ready");
 		
 		if (!defaultHidden)
@@ -280,6 +283,10 @@ public class VolumeSwipeService extends Service implements OnTouchListener {
 		if (ll != null) {
 			wm.removeView(ll);
 			ll = null;
+		}
+		if (logThread != null) {
+			logThread.stop();
+			logThread = null;
 		}
 		VolumeSwipe.log("Destroying service, destroying notification =" + (Options.getNotify(options) != Options.NOTIFY_ALWAYS));
 		stopForeground(Options.getNotify(options) != Options.NOTIFY_ALWAYS);

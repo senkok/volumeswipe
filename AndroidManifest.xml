@@ -10,7 +10,7 @@
 
     <application android:icon="@drawable/icon" android:label="VolumeSwipe"
     >
-        <activity android:name="VolumeSwipe"
+        <activity android:name=".VolumeSwipe"
                   android:label="VolumeSwipe"
                   android:launchMode="singleTask">
             <intent-filter>

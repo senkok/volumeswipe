@@ -49,14 +49,27 @@ public class VolumeController {
 			v=maxStreamVolume + extraDB;
 		else if (v<0)
 			v=0;
-		
+
 		am.setStreamVolume(AudioManager.STREAM_MUSIC, v <= maxStreamVolume ? v/100 : maxStreamVolume/100, 0/*AudioManager.FLAG_SHOW_UI*/);
 
 		if (extraDB > 0) {
 			if (maxStreamVolume < v) {
 				try {
-					for (short i=0; i<bands; i++)
-						eq.setBandLevel(i, (short)(v-maxStreamVolume));
+					int value = v-maxStreamVolume;
+					for (short i=0; i<bands; i++) {
+						short adj = (short)value;
+
+						if (true) {
+							int hz = eq.getCenterFreq((short)i)/1000;
+							if (hz < 150)
+								adj = 0;
+							else if (hz < 250)
+								adj = (short)(v/2);
+							else if (hz > 8000)
+								adj = (short)(3*(int)v/4);
+						}
+						eq.setBandLevel((short)i, adj);
+					}
 				}
 				catch(UnsupportedOperationException e) {
 					Log.e("VolumeSwipe", e.toString());
