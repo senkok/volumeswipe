@@ -64,9 +64,9 @@ public class VolumeController {
 							if (hz < 150)
 								adj = 0;
 							else if (hz < 250)
-								adj = (short)(v/2);
+								adj = (short)(value/2);
 							else if (hz > 8000)
-								adj = (short)(3*(int)v/4);
+								adj = (short)(3*(int)value/4);
 						}
 						eq.setBandLevel((short)i, adj);
 					}
@@ -91,11 +91,19 @@ public class VolumeController {
 		
 		try {
 			float total = 0;
+			int count = 0;
 			
-			for (short i=0; i<bands; i++)
-				total += eq.getBandLevel(i);
-	
-			volume += (int)(total/bands+.5f);
+			for (short i=0; i<bands; i++) {
+				int hz = eq.getCenterFreq((short)i)/1000;
+				if (250 <= hz && hz <= 8000) {
+					total += eq.getBandLevel(i);
+					count++;
+					VolumeSwipe.log(""+i+" "+eq.getBandLevel(i));
+				}
+			}
+			
+			if (0<count)
+				volume += (int)(total/count+.5f);
 		}
 		catch (UnsupportedOperationException e) {
 			Log.e("VolumeSwipe", e.toString());			
