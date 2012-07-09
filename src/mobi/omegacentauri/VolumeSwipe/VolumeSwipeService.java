@@ -46,7 +46,7 @@ public class VolumeSwipeService extends Service implements OnTouchListener {
 	
 	private boolean defaultHidden = true;
 	private static final int HEIGHT_DELTA_DP = 50;
-	private static final float BOOST = 0.4f;
+	private static final float BOOST = 0.6f;
 	private int height_delta;
 	private int[] widths = {30, 50, 80, 20};
 	private final Messenger messenger = new Messenger(new IncomingHandler());
@@ -171,7 +171,7 @@ public class VolumeSwipeService extends Service implements OnTouchListener {
 			
 			try {
 				VolumeSwipe.log("logcat monitor starting");
-				String[] cmd = { "logcat", "-b", "events" };
+				String[] cmd = { "logcat", "-b", "events", "am_on_resume_called:I" };
 				p = Runtime.getRuntime().exec(cmd);
 				reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 				VolumeSwipe.log("reading");
@@ -346,12 +346,12 @@ public class VolumeSwipeService extends Service implements OnTouchListener {
 			int maxVolume = vc.getMaxVolume();
 			
 			if (startY * startVolume < (height-startY)*(maxVolume-startVolume)) {
-				VolumeSwipe.log("A:"+startY+" "+y+" 0 "+startVolume+" "+maxVolume);
-				newVolume = (int)interpolate(startY, y, 0, startVolume, maxVolume);
+				newVolume = (int)(interpolate(startY, y, 0, startVolume, maxVolume)+.5);
+				VolumeSwipe.log("A:"+startY+" "+y+" 0 "+startVolume+" "+maxVolume+" > "+newVolume);
 			}
 			else {
-				VolumeSwipe.log("B:"+height+" "+y+" "+startY+" "+0+" "+startVolume);
-				newVolume = (int)interpolate(height, y, startY, 0, startVolume);
+				newVolume = (int)(interpolate(height, y, startY, 0, startVolume)+.5);
+				VolumeSwipe.log("B:"+height+" "+y+" "+startY+" "+0+" "+startVolume+" > "+newVolume);
 			}
 			
 			if (newVolume < 0)

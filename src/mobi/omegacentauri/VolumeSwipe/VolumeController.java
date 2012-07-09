@@ -15,7 +15,7 @@ public class VolumeController {
 
 	VolumeController(Context context, float boost) {
 		am = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
-		maxStreamVolume = 100*am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+		maxStreamVolume = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 		
 		VolumeSwipe.log("maxStreamVolume "+maxStreamVolume);
 		
@@ -23,7 +23,7 @@ public class VolumeController {
 			try {
 				eq = new Equalizer(0, 0);
 				bands = eq.getNumberOfBands();
-				extraDB = (int)(eq.getBandLevelRange()[1] * boost);
+				extraDB = (int)(eq.getBandLevelRange()[1] * boost) / 100;
 				eq.setEnabled(extraDB>0);
 			}
 			catch(UnsupportedOperationException e) {
@@ -50,7 +50,7 @@ public class VolumeController {
 		else if (v<0)
 			v=0;
 
-		am.setStreamVolume(AudioManager.STREAM_MUSIC, v <= maxStreamVolume ? v/100 : maxStreamVolume/100, 0/*AudioManager.FLAG_SHOW_UI*/);
+		am.setStreamVolume(AudioManager.STREAM_MUSIC, v <= maxStreamVolume ? v : maxStreamVolume, 0/*AudioManager.FLAG_SHOW_UI*/);
 
 		if (extraDB > 0) {
 			if (maxStreamVolume < v) {
@@ -68,13 +68,13 @@ public class VolumeController {
 							else if (hz > 8000)
 								adj = (short)(3*(int)value/4);
 						}
-						eq.setBandLevel((short)i, adj);
+						eq.setBandLevel((short)i, (short)(adj*100));
 					}
 				}
 				catch(UnsupportedOperationException e) {
 					Log.e("VolumeSwipe", e.toString());
 				}
-				VolumeSwipe.log("Boost set to "+getVolume());
+				VolumeSwipe.log("Set with boost to "+getVolume());
 			}
 			else {
 				reset();
@@ -84,7 +84,8 @@ public class VolumeController {
 	}
 	
 	public int getVolume() {
-		int volume = 100*am.getStreamVolume(AudioManager.STREAM_MUSIC);
+		int volume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+		VolumeSwipe.log("base volume = "+volume);
 		
 		if (extraDB == 0)
 			return volume;
@@ -96,7 +97,7 @@ public class VolumeController {
 			for (short i=0; i<bands; i++) {
 				int hz = eq.getCenterFreq((short)i)/1000;
 				if (250 <= hz && hz <= 8000) {
-					total += eq.getBandLevel(i);
+					total += eq.getBandLevel(i)/100;
 					count++;
 					VolumeSwipe.log(""+i+" "+eq.getBandLevel(i));
 				}
@@ -109,6 +110,7 @@ public class VolumeController {
 			Log.e("VolumeSwipe", e.toString());			
 		}
 		
+		VolumeSwipe.log("total volume = "+volume);
 		return volume;
 	}
 	
