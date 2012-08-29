@@ -51,7 +51,7 @@
 		</RadioGroup>
 		<CheckBox android:layout_height="wrap_content"
 			android:layout_width="wrap_content" android:id="@+id/boost"
-			android:text="Boost volume (at your own risk)" android:textSize="24sp" />
+			android:text="Boost volume (at your own risk, could damage speakers)" android:textSize="20sp" />
 		<LinearLayout android:layout_width="fill_parent"
 			android:layout_height="0sp" android:layout_weight="1" />
 		
