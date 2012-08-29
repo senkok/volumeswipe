@@ -301,13 +301,6 @@ public class VolumeSwipe extends Activity implements ServiceConnection {
 		
 		active = options.getBoolean(Options.PREF_ACTIVE, false);
 
-		if (active) {			
-			restartService(true);
-		}
-		else {
-			stopService();
-		}
-		
 		activeBox = (CheckBox)findViewById(R.id.active);
 		activeBox.setChecked(active);
 		activeBox.setOnCheckedChangeListener(new OnCheckedChangeListener(){
@@ -318,6 +311,12 @@ public class VolumeSwipe extends Activity implements ServiceConnection {
 					saveOS();
 				}
 				setActive(value, true);
+				
+				if (value) 
+					message("Important information",
+							"If you wish to uninstall or upgrade VolumeSwipe, uncheck the 'Active' "+
+							"button before uninstalling or upgrading, or some system resources "+
+							"will be wasted (they can be reclaimed by rebooting your device).");
 			}});
 		
 		boostBox = (CheckBox)findViewById(R.id.boost);
@@ -376,6 +375,13 @@ public class VolumeSwipe extends Activity implements ServiceConnection {
 	@Override
 	public void onResume() {
 		super.onResume();
+		
+		if (active) {			
+			restartService(true);
+		}
+		else {
+			stopService();
+		}
 		
 		((RadioButton)findViewById(R.id.left)).setChecked(
 				options.getBoolean(Options.PREF_LEFT, true));

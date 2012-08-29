@@ -11,4 +11,9 @@
     android:title="Active in all apps"
     android:defaultValue="false"
     android:key="activeInAll"/>
+<CheckBoxPreference 
+    android:title="Non-uniform boost"
+    android:summary="This moderates low and high frequency boosts, improving voice clarity and MAYBE decreasing speaker destruction danger." 
+    android:key="shape"
+    android:defaultValue="true"/>
 </PreferenceScreen>

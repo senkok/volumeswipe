@@ -59,6 +59,8 @@ public class VolumeSwipeService extends Service implements OnTouchListener {
 	private VolumeController vc;
 	private float scale;
 	private Thread logThread = null;
+	private Process logProcess = null;
+	private boolean interruptReader = false;
 	private static final int windowType = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT; // PHONE, ALERT, DIALOG, OVERLAY, ERROR
 	
 	private static final String[] intercept = {
@@ -126,8 +128,9 @@ public class VolumeSwipeService extends Service implements OnTouchListener {
 		}
 	}
 	
-	private void setBoost() {
-		vc = new VolumeController(VolumeSwipeService.this, options.getBoolean(Options.PREF_BOOST, false) ? BOOST: 0f);		
+	private void setBoost() {		
+		vc = new VolumeController(VolumeSwipeService.this, options.getBoolean(Options.PREF_BOOST, false) ? BOOST: 0f,
+				options.getBoolean(Options.PREF_SHAPE, true));
 	}
 	
 	private boolean activeFor(String s) {
@@ -167,13 +170,13 @@ public class VolumeSwipeService extends Service implements OnTouchListener {
 		for(;;) {
 			
 			BufferedReader reader = null;
-			Process p = null;
+			logProcess = null;
 			
 			try {
 				VolumeSwipe.log("logcat monitor starting");
-				String[] cmd = { "logcat", "-b", "events", "am_on_resume_called:I" };
-				p = Runtime.getRuntime().exec(cmd);
-				reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				String[] cmd = { "logcat", "-b", "events", "am_on_resume_called:I", "*:S" };
+				logProcess = Runtime.getRuntime().exec(cmd);
+				reader = new BufferedReader(new InputStreamReader(logProcess.getInputStream()));
 				VolumeSwipe.log("reading");
 				
 				String line;
@@ -181,6 +184,9 @@ public class VolumeSwipeService extends Service implements OnTouchListener {
 					("I/am_on_resume_called.*:\\s+(.*)"); // .*\\[[^,\\]]+,[^,\\]]+,([^,\\]]+)"); 
 				
 				while (null != (line = reader.readLine())) {
+					if (interruptReader)
+						break;
+
 					Matcher m = pattern.matcher(line);
 					if (m.find()) {
 						processRestart(m.group(1));
@@ -192,9 +198,15 @@ public class VolumeSwipeService extends Service implements OnTouchListener {
 			}
 			catch(IOException e) {
 				VolumeSwipe.log("logcat: "+e);
-				if (p != null)
-					p.destroy();
+				if (logProcess != null)
+					logProcess.destroy();
 			}
+			
+			if (interruptReader) {
+				VolumeSwipe.log("reader interrupted");
+			    return;
+			}
+
 			
 			VolumeSwipe.log("logcat monitor died");
 			try {
@@ -258,9 +270,10 @@ public class VolumeSwipeService extends Service implements OnTouchListener {
 
 		startForeground(VolumeSwipe.NOTIFICATION_ID, n);
 		
-		Runnable logRunnable = new Runnable(){
-			@Override
-			public void run() {
+        Runnable logRunnable = new Runnable(){
+        	@Override
+        	public void run() {
+                interruptReader = false;
 				monitorLog();
 			}};  
 		logThread = new Thread(logRunnable);
@@ -284,10 +297,21 @@ public class VolumeSwipeService extends Service implements OnTouchListener {
 			wm.removeView(ll);
 			ll = null;
 		}
+		
 		if (logThread != null) {
-			logThread.stop();
-			logThread = null;
+			interruptReader = true;
+			try {
+				if (logProcess != null) {
+					VolumeSwipe.log("Destroying service, killing reader");
+					logProcess.destroy();
+				}
+//				logThread = null;
+			}
+			catch (Exception e) {
+			}  
 		}
+		if (vc != null)
+			vc.destroy();
 		VolumeSwipe.log("Destroying service, destroying notification =" + (Options.getNotify(options) != Options.NOTIFY_ALWAYS));
 		stopForeground(Options.getNotify(options) != Options.NOTIFY_ALWAYS);
 	}
