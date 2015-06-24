@@ -1,0 +1,1 @@
+VolumeSwipe lets you change and boost the volume in selected apps by swiping along the side of the screen.
